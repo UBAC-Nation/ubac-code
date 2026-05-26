@@ -1,14 +1,172 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UBAC · Buscador</title>
+    <link rel="stylesheet" href="/assets/css/up-rise.css">
+    <style>
+        body {
+            background: #fffef7;
+            padding: 20px;
+        }
+
+        .search-results {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .result-item {
+            background: #fffef7;
+            border: 1px solid #e5e5e0;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: border 0.2s;
+        }
+
+        .result-item:hover {
+            border-color: #b33;
+        }
+
+        .result-hash {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #b33;
+            margin-bottom: 8px;
+        }
+
+        .result-nombre {
+            font-size: 18px;
+            font-family: 'Georgia', serif;
+            margin-bottom: 8px;
+        }
+
+        .result-email {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .result-fecha {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-family: 'Courier New', monospace;
+        }
+
+        .query-highlight {
+            background: #f5e6d3;
+            color: #b33;
+            padding: 0 2px;
+        }
+    </style>
 </head>
-
 <body>
-  
-</body>
+    <div class="search-results" id="resultsContainer">
+        <div class="no-results">🔍 Buscando...</div>
+    </div>
 
+    <script>
+        // Obtener query de la URL (Cloudflare mantiene la query string)
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+
+        // Base de datos de ejemplo (esto vendría de Firebase)
+        const ciudadanos = [
+            { hash: "000000G5861U", nombre: "Ana", email: "ana@ubac.com", fecha: "2025-01-15" },
+            { hash: "000001H6972V", nombre: "MiAno", email: "miano@ubac.com", fecha: "2025-02-20" },
+            { hash: "000002I7083W", nombre: "Lucía", email: "lucia@ubac.com", fecha: "2025-03-10" },
+            { hash: "000003J8194X", nombre: "Miguel", email: "miguel@ubac.com", fecha: "2025-04-05" }
+        ];
+
+        function highlightText(text, busqueda) {
+            if (!busqueda) return text;
+            const regex = new RegExp(`(${busqueda.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, `<span class="query-highlight">$1</span>`);
+        }
+
+        function buscar(query) {
+            const container = document.getElementById('resultsContainer');
+            
+            if (!query || query.trim() === '') {
+                container.innerHTML = '<div class="no-results">🔍 Ingresa un término de búsqueda</div>';
+                return;
+            }
+
+            const queryLower = query.toLowerCase().trim();
+            
+            const resultados = ciudadanos.filter(c => 
+                c.hash.toLowerCase().includes(queryLower) ||
+                c.nombre.toLowerCase().includes(queryLower) ||
+                c.email.toLowerCase().includes(queryLower)
+            );
+
+            if (resultados.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        ❌ No se encontraron resultados para "<strong>${escapeHtml(query)}</strong>"
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="no-results" style="padding-bottom:20px">
+                    🔍 ${resultados.length} resultado(s) para "<strong>${escapeHtml(query)}</strong>"
+                </div>
+                ${resultados.map(c => `
+                    <div class="result-item" data-hash="${c.hash}">
+                        <div class="result-hash">🔹 ${highlightText(c.hash, query)}</div>
+                        <div class="result-nombre">${highlightText(c.nombre, query)}</div>
+                        <div class="result-email">📧 ${highlightText(c.email, query)}</div>
+                        <div class="result-fecha">📅 Registrado: ${c.fecha}</div>
+                    </div>
+                `).join('')}
+            `;
+
+            document.querySelectorAll('.result-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const hash = item.dataset.hash;
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'ciudadanoSeleccionado',
+                            data: { hash: hash }
+                        }, '*');
+                    }
+                });
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Ejecutar búsqueda si hay query en la URL (funciona en Cloudflare)
+        if (query) {
+            buscar(decodeURIComponent(query));
+        } else {
+            document.getElementById('resultsContainer').innerHTML = '<div class="no-results">🔍 Esperando búsqueda...</div>';
+        }
+
+        // Escuchar mensajes desde el dashboard (Cloudflare Workers con postMessage)
+        window.addEventListener('message', (event) => {
+            const { type, data } = event.data || {};
+            
+            if (type === 'buscar' && data?.query) {
+                buscar(data.query);
+                // Actualizar URL en Cloudflare (sin recargar)
+                const newUrl = `${window.location.pathname}?query=${encodeURIComponent(data.query)}`;
+                window.history.pushState({}, '', newUrl);
+            }
+        });
+    </script>
+</body>
 </html>

@@ -1,0 +1,31 @@
+// wrangler.jsonc - Configuración del Worker
+{
+"$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+"name": "ubac-code",
+"main": "src/worker.js",
+"compatibility_date": "2026-05-26",
+"compatibility_flags": ["nodejs_compat"],
+"observability": {
+"enabled": true
+},
+"assets": {
+"directory": "./",
+"binding": "ASSETS"
+},
+"routes": [
+{
+"pattern": "ubac-nation.workers.dev/*",
+"custom_domain": true
+}
+],
+"env": {
+"production": {
+"routes": [
+{
+"pattern": "ubac-nation.github.io",
+"custom_domain": true
+}
+]
+}
+}
+}
