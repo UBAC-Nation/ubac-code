@@ -72,7 +72,7 @@ const SPLASH_HTML = `<!DOCTYPE html>
             } else {
                 clearInterval(messageInterval);
                 setTimeout(() => {
-                    hashElement.textContent = "VUB-25 ████████";
+                    hashElement.textContent = "VUB-25";
                     hashElement.style.color = '#b33';
                 }, 300);
             }
