@@ -1,137 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard · UBAC</title>
     <link rel="stylesheet" href="/assets/css/up-rise.css">
-    <style>
-        /* Transiciones suaves para el iframe */
-        .up-iframe-container iframe {
-            transition: opacity 0.15s ease;
-        }
-        .up-iframe-container iframe.loading {
-            opacity: 0.6;
-        }
-    </style>
 </head>
+
 <body>
-<div class="up-dashboard">
-    <!-- Sidebar estilo GitHub -->
-    <aside class="up-sidebar">
-        <div class="up-sidebar-header">
-            <h1>UBAC</h1>
-            <div class="up-sub">País Digital</div>
+    
+    <!-- TOOLBAR SUPERIOR -->
+    <header class="ubac-header">
+        <div class="ubac-header-left">
+            <input type="text" class="ubac-search" placeholder="Buscar...">
         </div>
-        <nav class="up-nav">
-            <a href="/dashboard/main" class="up-nav-item" data-section="main">
-                <span class="up-nav-icon">🏠</span>
-                <span>Inicio</span>
-            </a>
-            <a href="/dashboard/periodico" class="up-nav-item" data-section="periodico">
-                <span class="up-nav-icon">📰</span>
-                <span>Periódico</span>
-            </a>
-            <a href="/dashboard/propuestas" class="up-nav-item" data-section="propuestas">
-                <span class="up-nav-icon">📋</span>
-                <span>Propuestas</span>
-            </a>
-            <a href="/dashboard/empresa" class="up-nav-item" data-section="empresa">
-                <span class="up-nav-icon">🏢</span>
-                <span>Mi Empresa</span>
-            </a>
-            <a href="/dashboard/settings" class="up-nav-item" data-section="settings">
-                <span class="up-nav-icon">⚙️</span>
-                <span>Ajustes</span>
-            </a>
-        </nav>
-    </aside>
-
-    <!-- Contenido principal -->
-    <main class="up-main">
-        <header class="up-header">
-            <h1 id="pageTitle">Inicio</h1>
-            <p id="pageDescription">Bienvenido a tu dashboard ciudadano</p>
-        </header>
-        <div class="up-iframe-container">
-            <iframe id="contentFrame" src="/dashboard/pages/main.html"></iframe>
+        <div class="ubac-header-right">
+            <button class="ubac-icon-btn" aria-label="Notificaciones">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+            </button>
+            <button class="ubac-icon-btn" aria-label="Perfil">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+            </button>
         </div>
-    </main>
-</div>
-
-<script>
-    const iframe = document.getElementById('contentFrame');
-    const pageTitle = document.getElementById('pageTitle');
-    const pageDescription = document.getElementById('pageDescription');
+    </header>
     
-    // Configuración de secciones
-    const sections = {
-        main: { title: 'Inicio', description: 'Bienvenido a tu dashboard ciudadano', icon: '🏠' },
-        periodico: { title: 'Periódico', description: 'Últimas noticias de UBAC', icon: '📰' },
-        propuestas: { title: 'Propuestas', description: 'Vota y participa en las decisiones', icon: '📋' },
-        empresa: { title: 'Mi Empresa', description: 'Gestiona tu negocio digital', icon: '🏢' },
-        settings: { title: 'Ajustes', description: 'Configura tu perfil y preferencias', icon: '⚙️' }
-    };
-    
-    function updateUI(section) {
-        const config = sections[section] || sections.main;
-        pageTitle.innerHTML = `${config.icon} ${config.title}`;
-        pageDescription.textContent = config.description;
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="ubac-container">
         
-        // Marcar elemento activo en el menú
-        document.querySelectorAll('.up-nav-item').forEach(link => {
-            const linkSection = link.getAttribute('data-section');
-            if (linkSection === section) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
-    }
-    
-    function loadSection(section, pushState = true) {
-        if (!sections[section]) section = 'main';
-        
-        // Mostrar loading
-        iframe.classList.add('loading');
-        
-        // Cargar el iframe
-        iframe.src = `/dashboard/pages/${section}.html`;
-        
-        // Actualizar UI
-        updateUI(section);
-        
-        // Quitar loading cuando termine de cargar
-        iframe.onload = () => {
-            iframe.classList.remove('loading');
-        };
-        
-        // Actualizar URL sin recargar
-        if (pushState) {
-            window.history.pushState({ section }, '', `/dashboard/${section}`);
-        }
-    }
-    
-    // Obtener sección desde la URL (ej: /dashboard/settings → "settings")
-    const path = window.location.pathname;
-    const currentSection = path.replace('/dashboard/', '') || 'main';
-    loadSection(currentSection, false);
-    
-    // Manejar clics en el menú
-    document.querySelectorAll('.up-nav-item').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = link.getAttribute('data-section');
-            loadSection(section, true);
-        });
-    });
-    
-    // Manejar botón atrás/adelante del navegador
-    window.addEventListener('popstate', (event) => {
-        const path = window.location.pathname;
-        const section = path.replace('/dashboard/', '') || 'main';
-        loadSection(section, false);
-    });
-</script>
+    </div>
 </body>
+
 </html>

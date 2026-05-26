@@ -1,47 +1,8 @@
 /*!
- * UPrise v2.0
- * Librería de estilo UBAC
- * Inspirado en GitHub pero con alma de periódico digital
+ * UPrise v3.0 - GitHub Dashboard Edition
+ * Clon exacto del layout de GitHub, con estilo UBAC
  * Licencia: VUB-25
  */
-
-/* ============================================
-   VARIABLES (modo claro estilo GitHub)
-   ============================================ */
-:root {
-  /* Colores base GitHub */
-  --up-canvas: #ffffff;
-  --up-bg: #f6f8fa;
-  --up-border: #d0d7de;
-  --up-border-light: #eaeef2;
-  
-  /* Tipografía GitHub */
-  --up-text: #1f2328;
-  --up-text-secondary: #656d76;
-  --up-text-tertiary: #8c959f;
-  
-  /* Acentos GitHub */
-  --up-accent: #0969da;
-  --up-accent-hover: #0550ae;
-  --up-success: #1a7f37;
-  --up-danger: #cf222e;
-  --up-warning: #9a6700;
-  
-  /* Toques vintage UBAC */
-  --up-papel: #fffef7;
-  --up-vive: #b33;
-  --up-menosvive: #2e7d32;
-  --up-raya: #ddd;
-  
-  /* Tipografías */
-  --up-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-  --up-mono: "Courier New", "Fira Code", monospace;
-  --up-serif: "Georgia", "Times New Roman", serif;
-  
-  /* Layout */
-  --up-sidebar-width: 260px;
-  --up-header-height: 60px;
-}
 
 * {
   margin: 0;
@@ -50,331 +11,226 @@
 }
 
 body {
-  font-family: var(--up-sans);
-  background: var(--up-bg);
-  color: var(--up-text);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: #fffef7;
+  color: #1a1a1a;
   line-height: 1.5;
 }
 
-/* ============================================
-   DASHBOARD LAYOUT (estilo GitHub)
-   ============================================ */
-.up-dashboard {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* Sidebar estilo GitHub */
-.up-sidebar {
-  width: var(--up-sidebar-width);
-  background: var(--up-canvas);
-  border-right: 1px solid var(--up-border);
-  padding: 20px 16px;
-  display: flex;
-  flex-direction: column;
+/* ========== TOOLBAR SUPERIOR (igual a GitHub) ========== */
+.ubac-header {
   position: sticky;
   top: 0;
-  height: 100vh;
-  overflow-y: auto;
-}
-
-.up-sidebar-header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--up-border-light);
-}
-
-.up-sidebar-header h1 {
-  font-family: var(--up-serif);
-  font-size: 24px;
-  font-weight: normal;
-  letter-spacing: 1px;
-  color: var(--up-text);
-}
-
-.up-sidebar-header .up-sub {
-  font-size: 12px;
-  color: var(--up-text-tertiary);
-  margin-top: 4px;
-}
-
-/* Navegación estilo GitHub */
-.up-nav {
-  flex: 1;
-}
-
-.up-nav-item {
+  z-index: 32;
+  background: #faf9f4;
+  border-bottom: 1px solid #e5e5e0;
+  padding: 0 24px;
+  height: 60px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  margin: 2px 0;
-  color: var(--up-text);
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.1s ease;
+  justify-content: space-between;
 }
 
-.up-nav-item:hover {
-  background: var(--up-bg);
-  color: var(--up-accent);
-}
-
-.up-nav-item.active {
-  background: var(--up-accent);
-  color: white;
-}
-
-.up-nav-item.active .up-nav-icon {
-  color: white;
-}
-
-.up-nav-icon {
-  width: 20px;
-  text-align: center;
-  font-size: 16px;
-}
-
-/* Contenido principal */
-.up-main {
-  flex: 1;
+.ubac-header-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.ubac-logo {
+  font-size: 20px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-family: 'Georgia', serif;
+}
+
+.ubac-logo:hover {
+  color: #b33;
+}
+
+.ubac-search {
+  background: #fffef7;
+  border: 1px solid #e5e5e0;
+  border-radius: 0;
+  padding: 6px 12px;
+  width: 280px;
+  font-family: 'Georgia', serif;
+  font-size: 14px;
+}
+
+.ubac-search:focus {
+  outline: none;
+  border-color: #b33;
+}
+
+.ubac-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ubac-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ubac-icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: #1a1a1a;
+  stroke-width: 2;
+  fill: none;
+}
+
+.ubac-icon-btn:hover svg {
+  stroke: #b33;
+}
+
+/* ========== LAYOUT PRINCIPAL ========== */
+.ubac-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 24px;
+  display: flex;
+  gap: 32px;
+}
+
+/* Feed central (actividad) */
+.ubac-feed {
+  flex: 2;
   min-width: 0;
 }
 
-.up-header {
-  background: var(--up-canvas);
-  border-bottom: 1px solid var(--up-border);
-  padding: 16px 24px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.up-header h1 {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--up-text);
-}
-
-.up-header p {
-  font-size: 14px;
-  color: var(--up-text-secondary);
-  margin-top: 4px;
-}
-
-/* Contenedor del iframe */
-.up-iframe-container {
+/* Sidebar derecho */
+.ubac-sidebar-right {
   flex: 1;
-  padding: 24px;
+  min-width: 260px;
 }
 
-.up-iframe-container iframe {
-  width: 100%;
-  height: 100%;
-  border: 1px solid var(--up-border);
-  border-radius: 12px;
-  background: var(--up-canvas);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-/* ============================================
-   COMPONENTES DE PÁGINA (para los iframes)
-   ============================================ */
-.up-card {
-  background: var(--up-canvas);
-  border: 1px solid var(--up-border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-.up-card-header {
-  border-bottom: 1px solid var(--up-border-light);
-  padding-bottom: 16px;
+/* ========== TARJETAS (estilo GitHub) ========== */
+.ubac-card {
+  background: #fffef7;
+  border: 1px solid #e5e5e0;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
-.up-card-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--up-text);
-}
-
-.up-card-header p {
-  font-size: 14px;
-  color: var(--up-text-secondary);
-  margin-top: 4px;
-}
-
-/* Hash (estilo máquina de escribir) */
-.up-hash {
-  font-family: var(--up-mono);
-  background: var(--up-bg);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  word-break: break-all;
-  border-left: 3px solid var(--up-vive);
-  color: var(--up-text-secondary);
-}
-
-/* Badges */
-.up-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--up-bg);
-  color: var(--up-text-secondary);
-}
-
-.up-badge-success {
-  background: #dafbe1;
-  color: var(--up-success);
-}
-
-.up-badge-danger {
-  background: #ffebe9;
-  color: var(--up-danger);
-}
-
-.up-badge-warning {
-  background: #fff8e5;
-  color: var(--up-warning);
-}
-
-/* Formularios */
-.up-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--up-border);
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  background: var(--up-canvas);
-}
-
-.up-input:focus {
-  outline: none;
-  border-color: var(--up-accent);
-  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
-}
-
-.up-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: var(--up-text);
-}
-
-/* Botones estilo GitHub */
-.up-btn {
-  display: inline-flex;
+.ubac-card-header {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e5e0;
+}
+
+.ubac-card-header h2 {
+  font-size: 16px;
+  font-weight: normal;
+  font-family: 'Georgia', serif;
+}
+
+/* ========== ACTIVIDAD (feed) ========== */
+.ubac-actividad-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e5e0;
+}
+
+.ubac-actividad-item:last-child {
+  border-bottom: none;
+}
+
+.ubac-actividad-icon {
+  flex-shrink: 0;
+}
+
+.ubac-actividad-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: #888;
+  stroke-width: 2;
+  fill: none;
+}
+
+.ubac-actividad-contenido {
+  flex: 1;
+}
+
+.ubac-actividad-texto {
   font-size: 14px;
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1px solid var(--up-border);
-  background: var(--up-bg);
-  color: var(--up-text);
-  cursor: pointer;
-  transition: all 0.1s ease;
-  text-decoration: none;
+  line-height: 1.5;
+  margin-bottom: 4px;
 }
 
-.up-btn-primary {
-  background: var(--up-accent);
-  border-color: var(--up-accent);
-  color: white;
+.ubac-actividad-fecha {
+  font-size: 11px;
+  color: #888;
 }
 
-.up-btn-primary:hover {
-  background: var(--up-accent-hover);
-  border-color: var(--up-accent-hover);
-}
-
-.up-btn:hover {
-  background: var(--up-border-light);
-}
-
-/* Grid y utilidades */
-.up-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin: 24px 0;
-}
-
-.up-text-center {
-  text-align: center;
-}
-
-.up-mt-4 {
-  margin-top: 24px;
-}
-
-.up-mb-4 {
-  margin-bottom: 24px;
-}
-
-.up-p-4 {
-  padding: 24px;
-}
-
-/* Separador vintage UBAC */
-.up-separator {
-  height: 1px;
-  background: repeating-linear-gradient(90deg, var(--up-raya), var(--up-raya) 10px, transparent 10px, transparent 20px);
-  margin: 24px 0;
-}
-
-/* Footer */
-.up-footer {
-  text-align: center;
-  padding: 24px;
-  border-top: 1px solid var(--up-border-light);
+/* ========== HASH Y UBACANES ========== */
+.ubac-hash {
+  font-family: 'Courier New', monospace;
+  background: #f4f4f4;
+  padding: 12px;
   font-size: 12px;
-  color: var(--up-text-tertiary);
+  word-break: break-all;
+  margin: 12px 0;
+  border-left: 3px solid #b33;
 }
 
-/* Responsive */
+.ubac-stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+}
+
+.ubac-stat {
+  text-align: center;
+  flex: 1;
+}
+
+.ubac-stat-valor {
+  font-size: 24px;
+  font-weight: bold;
+  font-family: 'Georgia', serif;
+}
+
+.ubac-stat-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.ubac-link {
+  color: #b33;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.ubac-link:hover {
+  text-decoration: underline;
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
-  :root {
-    --up-sidebar-width: 72px;
+  .ubac-container {
+    flex-direction: column;
   }
   
-  .up-sidebar-header h1,
-  .up-sidebar-header .up-sub,
-  .up-nav-item span:not(.up-nav-icon) {
-    display: none;
+  .ubac-search {
+    width: 100%;
   }
   
-  .up-nav-item {
-    justify-content: center;
-    padding: 12px;
-  }
-  
-  .up-nav-icon {
-    font-size: 20px;
-    margin: 0;
-  }
-  
-  .up-header {
-    padding: 12px 16px;
-  }
-  
-  .up-iframe-container {
-    padding: 16px;
+  .ubac-header {
+    padding: 0 16px;
   }
 }
