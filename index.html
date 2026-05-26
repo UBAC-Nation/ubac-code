@@ -1,10 +1,278 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>UBAC - País Digital</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UBAC · Cargando</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #e8e5df;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+
+        /* Contenedor principal - estilo periódico */
+        .loading-container {
+            background: #fffef7;
+            padding: 60px 50px;
+            max-width: 550px;
+            width: 90%;
+            margin: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            position: relative;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Sutil borde decorativo */
+        .loading-container::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+        }
+
+        /* Título UBAC */
+        .ubac-title {
+            font-size: 72px;
+            letter-spacing: 4px;
+            font-weight: normal;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Subtítulo periódico */
+        .ubac-subtitle {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            display: inline-block;
+        }
+
+        /* Animación de puntos suspensivos */
+        .loading-dots {
+            font-size: 14px;
+            color: #444;
+            margin: 30px 0 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading-dots span {
+            animation: blink 1.4s infinite;
+            display: inline-block;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        .loading-dots span:nth-child(4) { animation-delay: 0.6s; }
+
+        @keyframes blink {
+            0%, 20% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Barra de progreso estilo periódico (rayas) */
+        .progress-bar {
+            width: 100%;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ddd,
+                #ddd 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            margin: 30px 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: #1a1a1a;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; left: 0; }
+            50% { width: 70%; left: 0; }
+            100% { width: 0%; left: 100%; }
+        }
+
+        /* Mensaje de estado */
+        .status-message {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            margin: 20px 0 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Pequeña línea decorativa */
+        .decorative-line {
+            width: 60px;
+            height: 1px;
+            background: #ddd;
+            margin: 25px auto 0;
+        }
+
+        /* Hash placeholder (como esperando algo) */
+        .hash-placeholder {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 25px;
+            letter-spacing: 1px;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Versión oscura opcional (para PWA modo oscuro si quieren) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1a1a1a;
+            }
+            .loading-container {
+                background: #2a2a2a;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            }
+            .ubac-title {
+                color: #fffef7;
+            }
+            .ubac-subtitle {
+                color: #888;
+                border-bottom-color: #444;
+            }
+            .status-message {
+                color: #999;
+            }
+            .progress-bar {
+                background: repeating-linear-gradient(90deg, #444, #444 10px, #2a2a2a 10px, #2a2a2a 20px);
+            }
+            .progress-fill {
+                background: #fffef7;
+            }
+            .hash-placeholder {
+                color: #555;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .loading-container {
+                padding: 40px 30px;
+            }
+            .ubac-title {
+                font-size: 48px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>UBAC</h1>
-    <p>Bienvenido al país digital sin fronteras.</p>
+    <div class="loading-container">
+        <div class="ubac-title">UBAC</div>
+        <div class="ubac-subtitle">Un mundo digital</div>
+        
+        <div class="loading-dots">
+            Cargando identidad<span>.</span><span>.</span><span>.</span>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <div class="status-message" id="statusMessage">
+            Verificando hash VUB-25
+        </div>
+        
+        <div class="decorative-line"></div>
+        
+        <div class="hash-placeholder" id="hashPlaceholder">
+            ██████████████
+        </div>
+    </div>
+
+    <script>
+        // Secuencia de mensajes para la carga
+        const messages = [
+            "Verificando hash VUB-25",
+            "Conectando con Firebase",
+            "Cargando configuración",
+            "Preparando tu identidad digital",
+            "Casi listo..."
+        ];
+        
+        let messageIndex = 0;
+        const statusElement = document.getElementById('statusMessage');
+        const hashElement = document.getElementById('hashPlaceholder');
+        
+        // Simulación de carga con cambio de mensajes cada 800ms
+        const messageInterval = setInterval(() => {
+            messageIndex++;
+            if (messageIndex < messages.length) {
+                statusElement.style.opacity = '0';
+                setTimeout(() => {
+                    statusElement.textContent = messages[messageIndex];
+                    statusElement.style.opacity = '1';
+                }, 150);
+            } else {
+                clearInterval(messageInterval);
+                // Cambiar el placeholder a algo más "real"
+                setTimeout(() => {
+                    hashElement.textContent = "VUB-25 ████████";
+                    hashElement.style.color = '#b33';
+                }, 300);
+            }
+        }, 800);
+        
+        // Simular que después de 3.5 segundos redirige o completa
+        setTimeout(() => {
+            // Aquí puedes redirigir a la página principal o dashboard
+            // window.location.href = '/app/dashboard.html';
+            
+            // O solo mostrar mensaje final
+            statusElement.textContent = "¡Identidad verificada!";
+            statusElement.style.color = '#2e7d32';
+            hashElement.style.opacity = '0.5';
+        }, 3500);
+    </script>
 </body>
 </html>
