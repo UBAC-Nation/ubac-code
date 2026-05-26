@@ -1,14 +1,307 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UBAC · Registro</title>
+    <link rel="stylesheet" href="/assets/css/up-rise.css">
+    <style>
+        body {
+            background: #e8e5df;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .register-container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .register-card {
+            background: #fffef7;
+            border: 1px solid #e5e5e0;
+            padding: 40px;
+        }
+
+        .register-title {
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .register-subtitle {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e5e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e5e0;
+            background: #fffef7;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #b33;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            color: #fffef7;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .register-btn:hover {
+            background: #b33;
+        }
+
+        .register-btn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        .mensaje {
+            margin-top: 20px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .mensaje.error {
+            background: #fef0f0;
+            color: #b33;
+            border-left: 3px solid #b33;
+        }
+
+        .mensaje.ok {
+            background: #f0fef0;
+            color: #2e7d32;
+            border-left: 3px solid #2e7d32;
+        }
+
+        .hash-preview {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f4f4f4;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            border-left: 3px solid #b33;
+            display: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        .login-link a {
+            color: #b33;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .decorative-line {
+            width: 60px;
+            height: 1px;
+            background: #e5e5e0;
+            margin: 20px auto 0;
+        }
+    </style>
 </head>
-
 <body>
-  
-</body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-title">UBAC</div>
+            <div class="register-subtitle">Crear identidad digital</div>
 
+            <div class="form-group">
+                <label class="form-label">NOMBRE COMPLETO</label>
+                <input type="text" id="nombre" class="form-input" placeholder="Nombre...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">CORREO ELECTRÓNICO</label>
+                <input type="email" id="email" class="form-input" placeholder="Correo Electrónico...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">CONTRASEÑA</label>
+                <input type="password" id="password" class="form-input" placeholder="Contraseña... (Mas de 6 carácteres)">
+            </div>
+
+            <button id="registerBtn" class="register-btn">Comenzar</button>
+
+            <div id="mensaje" class="mensaje"></div>
+            <div id="hashPreview" class="hash-preview"></div>
+
+            <div class="login-link">
+                ¿Ya tienes cuenta? <a href="/auth/login/">Inicia sesión</a>
+            </div>
+            <div class="decorative-line"></div>
+        </div>
+    </div>
+
+    <script>
+        // Función VUB-25 (hash propietario)
+        function VUB25(texto) {
+            let semilla = 0;
+            for (let i = 0; i < texto.length; i++) semilla += texto.charCodeAt(i) * (i + 1);
+            const rand = (function(seed) {
+                let a = seed;
+                return () => ((a = (a * 9301 + 49297) % 233280) / 233280);
+            })(semilla);
+            const tile = Array(6).fill().map(() => Array(6).fill(' '));
+            for (let i = 0; i < 36; i++) {
+                const f = Math.floor(i / 6), c = i % 6;
+                tile[f][c] = texto[i % texto.length];
+            }
+            const mov = (texto.length % 5) + 1;
+            for (let x = 0; x < mov; x++) {
+                for (let f = 0; f < 6; f++) {
+                    const p = Math.floor(rand() * 6);
+                    [tile[f][p], tile[f][(p + 1) % 6]] = [tile[f][(p + 1) % 6], tile[f][p]];
+                }
+                for (let c = 0; c < 6; c++) {
+                    const p = Math.floor(rand() * 6);
+                    [tile[p][c], tile[(p + 1) % 6][c]] = [tile[(p + 1) % 6][c], tile[p][c]];
+                }
+            }
+            const rev = Math.floor(semilla % 3) + 1;
+            for (let f = 0; f < 6; f++) {
+                for (let c = 0; c < 6; c++) {
+                    if ((f + c) % rev === 0) tile[f][c] = String.fromCharCode((tile[f].join('').length % 26) + 65);
+                }
+            }
+            let hash = tile.map(r => r.join('')).join('');
+            let final = 0;
+            for (let i = 0; i < hash.length; i++) final = (final * 31 + hash.charCodeAt(i)) % 0xFFFFFFFF;
+            return final.toString(36).padStart(12, '0').slice(-12).toUpperCase();
+        }
+
+        const registerBtn = document.getElementById('registerBtn');
+        const mensajeDiv = document.getElementById('mensaje');
+        const hashPreviewDiv = document.getElementById('hashPreview');
+
+        function mostrarMensaje(texto, tipo) {
+            mensajeDiv.textContent = texto;
+            mensajeDiv.className = `mensaje ${tipo}`;
+            mensajeDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                mensajeDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function mostrarHash(hash) {
+            hashPreviewDiv.textContent = `🔹 VUB-25: ${hash}`;
+            hashPreviewDiv.style.display = 'block';
+        }
+
+        registerBtn.addEventListener('click', async () => {
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!nombre || !email || !password) {
+                mostrarMensaje('Completa todos los campos', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                mostrarMensaje('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'CREANDO...';
+
+            try {
+                // 1. Generar hash VUB-25 único
+                const id = 'UBAC-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                const fecha = new Date().toISOString().split('T')[0];
+                const secreto = 'ubac_secret_' + Date.now();
+                const datosHash = `${id}|${nombre}|${email}|${fecha}|${secreto}`;
+                const hash = VUB25(datosHash);
+                
+                mostrarHash(hash);
+
+                // 2. Enviar a Cloudflare Worker (D1 + R2)
+                const response = await fetch('/api/registro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nombre: nombre,
+                        email: email,
+                        password: password,
+                        hash: hash,
+                        id: id,
+                        fecha: fecha
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    mostrarMensaje('✓ Identidad creada correctamente', 'ok');
+                    
+                    // Guardar hash en localStorage
+                    localStorage.setItem('ubac_hash', hash);
+                    localStorage.setItem('ubac_nombre', nombre);
+                    
+                    // Redirigir al dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 2000);
+                } else {
+                    mostrarMensaje(data.error || 'Error al crear identidad', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error de conexión con el servidor', 'error');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'CREAR IDENTIDAD';
+            }
+        });
+    </script>
+</body>
 </html>
