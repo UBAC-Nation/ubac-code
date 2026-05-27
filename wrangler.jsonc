@@ -14,8 +14,8 @@
 },
 "routes": [
 {
-"pattern": "ubac-nation.workers.dev/*",
-"custom_domain": true
+"pattern": "ubac-nation.workers.dev/",
+"custom_domain": false
 }
 ],
 "env": {
