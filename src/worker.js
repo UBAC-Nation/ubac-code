@@ -1,5 +1,5 @@
 // worker.js - Cloudflare Worker para UBAC
-// Mejorado con caché, manejo de rutas, y sistema de splash
+// Mejorado con caché, manejo de rutas, sistema de splash y verificación en /app/*
 
 const SECCIONES_VALIDAS = new Set([
   'main', 'settings', 'propuestas', 'periodico', 'empresa',
@@ -11,7 +11,8 @@ const CONFIG = {
   CACHE_NAME: 'ubac-v1',
   CACHE_TTL: 3600, // 1 hora en segundos
   SPLASH_ENABLED: true,
-  SPLASH_MODE: 'first_visit' // 'first_visit' | 'always' | 'never'
+  SPLASH_MODE: 'first_visit', // 'first_visit' | 'always' | 'never'
+  APP_ALERT_MESSAGE: '⚠️ Verificación requerida. Acceso restringido a /app/*'
 };
 
 // HTML del splash (versión mejorada)
@@ -102,8 +103,25 @@ async function shouldShowSplash(request) {
   return !cookie.includes('ubac_visited=1');
 }
 
-// Helper para respuesta con caché
-async function cachedFetch(request, ttl = CONFIG.CACHE_TTL) {
+// Helper para inyectar alerta en respuestas HTML
+async function injectAlert(response, message) {
+  const contentType = response.headers.get('Content-Type') || '';
+  if (!contentType.includes('text/html')) {
+    return response;
+  }
+  const text = await response.text();
+  const script = `<script>alert("${message.replace(/"/g, '\\"')}");</script>`;
+  const modifiedText = text.replace('</head>', script + '</head>');
+  const newResponse = new Response(modifiedText, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+  return newResponse;
+}
+
+// Helper para respuesta con caché (corregido con ctx)
+async function cachedFetch(request, ctx, ttl = CONFIG.CACHE_TTL) {
   const cache = caches.default;
   let response = await cache.match(request);
   
@@ -119,7 +137,7 @@ async function cachedFetch(request, ttl = CONFIG.CACHE_TTL) {
   newResponse.headers.set('CF-Cache-Date', Date.now().toString());
   newResponse.headers.set('Cache-Control', `public, max-age=${ttl}`);
   
-  event.waitUntil(cache.put(request, newResponse.clone()));
+  ctx.waitUntil(cache.put(request, newResponse.clone()));
   return newResponse;
 }
 
@@ -136,21 +154,17 @@ function handleError(error, url) {
   });
 }
 
-// Manejo de rutas
+// Manejo de rutas para dashboard
 function handleDashboardRouting(url, request) {
   const pathname = url.pathname;
-  
-  // Transformar /dashboard/algo → /dashboard?_m=algo
   const match = pathname.match(/^\/dashboard\/([^/?]+)/);
   const seccion = match ? match[1] : 'main';
   
-  // Si la sección es válida, transformar
   if (seccion === 'main' || SECCIONES_VALIDAS.has(seccion)) {
     url.pathname = '/dashboard.html';
     url.searchParams.set('_m', seccion);
     return fetch(url.toString(), request);
   }
-  
   return null;
 }
 
@@ -185,7 +199,7 @@ async function handleSplash(request, url) {
 
 // Handler principal
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     
@@ -196,44 +210,61 @@ export default {
       
       // 2. Dashboard routing
       const dashboardResponse = handleDashboardRouting(url, request);
-      if (dashboardResponse) return addSecurityHeaders(await dashboardResponse);
+      if (dashboardResponse) {
+        let resp = await dashboardResponse;
+        resp = addSecurityHeaders(resp);
+        // Verificar si es ruta /app/* (después del dashboard? No es necesario porque dashboard es /dashboard/*)
+        if (pathname.startsWith('/app/')) {
+          resp = await injectAlert(resp, CONFIG.APP_ALERT_MESSAGE);
+        }
+        return resp;
+      }
+      
+      let response = null;
       
       // 3. Assets estáticos (con caché)
       if (pathname.startsWith('/assets/') ||
         pathname.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico)$/i)) {
-        return addSecurityHeaders(await cachedFetch(request));
+        response = await cachedFetch(request, ctx);
       }
-      
       // 4. Archivos de configuración
-      if (pathname === '/' ||
+      else if (pathname === '/' ||
         pathname === '/index.html' ||
         pathname === '/dashboard.html' ||
         pathname.startsWith('/auth/') ||
         pathname.startsWith('/config/')) {
-        return addSecurityHeaders(await cachedFetch(request, 300)); // 5 minutos
+        response = await cachedFetch(request, ctx, 300);
       }
-      
       // 5. API (sin caché, paso directo)
-      if (pathname.startsWith('/api/')) {
-        const response = await fetch(request);
-        return addSecurityHeaders(response);
+      else if (pathname.startsWith('/api/')) {
+        response = await fetch(request);
       }
-      
       // 6. Cualquier otra ruta, intentar servir como estático
-      const staticResponse = await cachedFetch(request, 3600);
-      if (staticResponse.status !== 404) {
-        return addSecurityHeaders(staticResponse);
+      else {
+        const staticResp = await cachedFetch(request, ctx, 3600);
+        if (staticResp.status !== 404) {
+          response = staticResp;
+        } else {
+          response = new Response(JSON.stringify({
+            error: 'Página no encontrada',
+            path: pathname,
+            timestamp: new Date().toISOString()
+          }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
       }
       
-      // 7. 404 personalizado
-      return new Response(JSON.stringify({
-        error: 'Página no encontrada',
-        path: pathname,
-        timestamp: new Date().toISOString()
-      }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      // Añadir cabeceras de seguridad
+      response = addSecurityHeaders(response);
+      
+      // Si la ruta empieza con /app/ y la respuesta es HTML, inyectar alerta
+      if (pathname.startsWith('/app/')) {
+        response = await injectAlert(response, CONFIG.APP_ALERT_MESSAGE);
+      }
+      
+      return response;
       
     } catch (error) {
       return handleError(error, url);
