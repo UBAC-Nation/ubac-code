@@ -1,4 +1,3 @@
-// wrangler.jsonc - Configuración del Worker
 {
 "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
 "name": "ubac-code",
@@ -11,21 +10,6 @@
 "assets": {
 "directory": "./",
 "binding": "ASSETS"
-},
-"routes": [
-{
-"pattern": "ubac-nation.workers.dev/",
-"custom_domain": false
 }
-],
-"env": {
-"production": {
-"routes": [
-{
-"pattern": "ubac-nation.github.io",
-"custom_domain": true
-}
-]
-}
-}
+// No incluyas "routes" ni "env"
 }
